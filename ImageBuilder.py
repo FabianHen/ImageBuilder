@@ -34,16 +34,19 @@ def find_same_color(x: int, y: int, rgb: tuple[int, int, int], image=Image.Image
     global input_image, output_image, value_array, check_array, image_list
     output_image.paste(image, (x * width, y * height))
     check_array[y][x] = 1
+    # Check pixel left to the current pixel
     if x != 0 and check_array[y][x-1] == 0:
         color_left = get_pixel_color(y, x-1)
         offset = calculate_offset(color_left, rgb)
         if offset < THRESHOLD:
             find_same_color(x-1, y, rgb, image)
+    # Check pixel underneath the current pixel
     if y != amount-1 and check_array[y + 1][x] == 0:
         color_bottom = get_pixel_color(y + 1, x)
         offset = calculate_offset(color_bottom, rgb)
         if offset < THRESHOLD:
             find_same_color(x, y + 1, rgb, image)
+    # Check pixel right to the curren pixel
     if x != amount-1 and check_array[y][x+1] == 0:
         color_right = get_pixel_color(y, x+1)
         offset = calculate_offset(color_right, rgb)
@@ -98,7 +101,6 @@ def create_image(amount: int):
         # Horizontal loop
         for x in range(0, amount):
             if (check_array[y][x] == 0):
-                print("NEXT\n")
                 fill(x, y)
     output_image.show()
 
@@ -116,24 +118,33 @@ def create_image_list(folder) -> None:
             avg_color = tuple(np.array(img).mean(axis=(0, 1)))
             # Creates a List that contains all Images and their RGB Values in a Tupel
             image_list.append((avg_color, img))
-    print("time for creating list", time.time() - start, "seconds")
-    print("Length of Imagelist:", len(image_list))
+    print("Using", len(image_list), "Images to create new image")
+
+
+def check_input() -> bool:
+    # Check amount of parameters
+    if len(sys.argv) < 4:
+        print(ANSIRED, "ERROR:", 4 - len(sys.argv),
+              "Missing Parameters!", STANDARD)
+        return False
+    # Check if the given image is valid
+    if not os.path.isfile(sys.argv[1]):
+        print(ANSIRED, "ERROR:", sys.argv[1], "is not a file!", STANDARD)
+        return False
+    # Check if the given amount is valid
+    if not sys.argv[2].isdigit():
+        print(ANSIRED, sys.argv[2], "is not a number!", STANDARD)
+        return False
+    # Check if the given directory is valid
+    if not os.path.isdir(sys.argv[3]):
+        print(ANSIRED, "ERROR:", sys.argv[3], " is not a directory!", STANDARD)
+        return False
+    return True
 
 
 def main():
     global input_image, output_image, value_array, check_array, image_list, width, height, amount
-
-    # Check if input was correct
-    if len(sys.argv) < 4:
-        print(ANSIRED + "ERROR: Missing Parameters:",
-              4 - len(sys.argv), STANDARD)
-        return
-    if not os.path.isfile(sys.argv[1]):
-        print(ANSIRED + "ERROR: " + sys.argv[1] + "is not a file!" + STANDARD)
-        return
-    if not os.path.isdir(sys.argv[3]):
-        print(ANSIRED + "ERROR: " +
-              sys.argv[3] + "is not a directory!" + STANDARD)
+    if not check_input():
         return
     im = Image.open(sys.argv[1]).convert('RGB')
     amount = int(sys.argv[2])
@@ -151,12 +162,10 @@ def main():
         resized = True
         im = im.resize(
             (int(10 * amount), int(10 * amount * image_height/image_width)))
-        print("Not wide enough - Resized")
     if height < 10:
         resized = True
         im = im.resize(
             (int(10 * amount * image_width/image_height), int(10 * amount)))
-        print("Not high enough - Resized")
     if resized:
         image_width, image_height = im.size
         width = image_width / amount
@@ -164,12 +173,10 @@ def main():
     width = math.ceil(image_width / amount)
     height = math.ceil(image_height / amount)
     im = im.resize((amount * width, amount * height))
-
     # Setting global variables
     input_image = im
     output_image = Image.new('RGB', input_image.size)
     create_image_list(sys.argv[3])
-
     print("Creating an Image with", str(amount) + "x" + str(amount) + "(" + str(amount*amount)
           + ")" ' "Pixels":')
     print(width, height)
