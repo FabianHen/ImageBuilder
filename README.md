@@ -3,7 +3,7 @@ This program builds an image out of other images. Don't know what that's suppose
 
 ## Here is an example
 ### Console Input: 
-<code> py ImageBuilder.py D:\Projects\ImageBuilder\example.jpg 200 </code><br>
+<code> py ImageBuilder.py D:\Projects\ImageBuilder\example.jpg 200 D:\Projects\ImageBuilder\Stock </code><br>
 <em>(Note that the "Stock" folder from this example is no part of this repository) </em><br>
 ### Input Image: 
 ![Input Image](example.jpg) <br>
