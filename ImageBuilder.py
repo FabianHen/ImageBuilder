@@ -102,6 +102,16 @@ def create_image(amount: int):
         for x in range(0, amount):
             if (check_array[y][x] == 0):
                 fill(x, y)
+    directory = os.path.dirname(sys.argv[1])
+    filename = os.path.basename(sys.argv[1])
+    name, extension = os.path.splitext(filename)
+    new_filename = f"{name}_result{extension}"
+    output_image_path = os.path.join(directory, new_filename)
+    output_image.save(output_image_path)
+
+    time_needed = time.time() - start
+    print(ANSIGREEN + "Process finished after",
+          time_needed, "seconds" + STANDARD)
     output_image.show()
 
 
@@ -181,9 +191,6 @@ def main():
           + ")" ' "Pixels":')
     print(width, height)
     create_image(amount)
-    time_needed = time.time() - start
-    print(ANSIGREEN + "Process finished after",
-          time_needed, "seconds" + STANDARD)
 
 
 start = time.time()
